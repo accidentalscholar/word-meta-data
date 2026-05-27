@@ -1,7 +1,7 @@
 # ==========================================
 # Word Metadata Extractor 
-# Version: 4.0
-# Citation: Pundir, V. (2026, May 27). Word Meta Data ExtractorVersion (4.0). Retrieved from https://github.com/accidentalscholar/word-meta-data. 
+# Version: 5.0
+# Citation: Pundir, V. (2026, May 27). Word Metadata Extractor Version (5.0). Retrieved from https://github.com/accidentalscholar/word-meta-data. 
 # Citation: RIS and BibTeX files included for referencing software.
 # Tested in: Python 3.10.9 64 bit packaged by Anaconda, Inc.
 # Reporsitory: https://github.com/accidentalscholar/word-meta-data
@@ -42,7 +42,7 @@ for import_name, pip_name in REQUIRED_PACKAGES.items():
 import pandas as pd
 
 # --- 2. Configuration ---
-VERSION = "4.0"
+VERSION = "5.0"
 OUTPUT_FILENAME = f"Word_Metadata_Extracted_v{VERSION}.xlsx"
 
 def get_xml_text(tree, tag_name):
@@ -187,33 +187,50 @@ def main():
     workbook = writer.book
     worksheet = writer.sheets['Metadata']
     
-    light_orange = workbook.add_format({'bg_color': '#FFD580'})
-    light_red    = workbook.add_format({'bg_color': '#FFCCCC'})
-    light_green  = workbook.add_format({'bg_color': '#CCFFCC'})
+    # Get dataframe dimensions
+    max_row = len(df)
+    max_col = len(df.columns)
     
-    max_row = len(df) + 1
+    if max_row > 0:
+        # Create a list of column headers, to use in add_table()
+        column_settings = [{'header': column} for column in df.columns]
+        
+        # Add the Excel table structure
+        worksheet.add_table(0, 0, max_row, max_col - 1, {
+            'columns': column_settings,
+            'name': 'MetadataTable',
+            'style': 'Table Style Medium 2' # Standard clean blue Excel table
+        })
     
-    if max_row > 1:
+        # Define Conditional Formatting colors
+        light_orange = workbook.add_format({'bg_color': '#FFD580'})
+        light_red    = workbook.add_format({'bg_color': '#FFCCCC'})
+        light_green  = workbook.add_format({'bg_color': '#CCFFCC'})
+        
+        # Accounting for header in 1-based Excel row math
+        excel_max_row = max_row + 1 
+        
         # Cols D & E (Authors vs Last saved by): Light orange if different
-        worksheet.conditional_format(f'D2:E{max_row}', {'type': 'formula', 'criteria': '=$D2<>$E2', 'format': light_orange})
+        worksheet.conditional_format(f'D2:E{excel_max_row}', {'type': 'formula', 'criteria': '=$D2<>$E2', 'format': light_orange})
         
         # Col F (Revision Number): Light orange if less than 2
-        worksheet.conditional_format(f'F2:F{max_row}', {'type': 'cell', 'criteria': 'less than', 'value': 2, 'format': light_orange})
+        worksheet.conditional_format(f'F2:F{excel_max_row}', {'type': 'cell', 'criteria': 'less than', 'value': 2, 'format': light_orange})
         
         # Col I (Total editing time): 3-tier formatting using the hidden _RawMinutes column (Column O)
-        # We use PERCENTILE (without the .INC) for strict legacy Excel backwards compatibility.
-        worksheet.conditional_format(f'I2:I{max_row}', {'type': 'formula', 'criteria': f'=$O2<=PERCENTILE($O$2:$O${max_row}, 0.33)', 'format': light_red})
-        worksheet.conditional_format(f'I2:I{max_row}', {'type': 'formula', 'criteria': f'=$O2>=PERCENTILE($O$2:$O${max_row}, 0.67)', 'format': light_green})
-        worksheet.conditional_format(f'I2:I{max_row}', {'type': 'formula', 'criteria': f'=AND($O2>PERCENTILE($O$2:$O${max_row}, 0.33), $O2<PERCENTILE($O$2:$O${max_row}, 0.67))', 'format': light_orange})
+        worksheet.conditional_format(f'I2:I{excel_max_row}', {'type': 'formula', 'criteria': f'=$O2<=PERCENTILE($O$2:$O${excel_max_row}, 0.33)', 'format': light_red})
+        worksheet.conditional_format(f'I2:I{excel_max_row}', {'type': 'formula', 'criteria': f'=$O2>=PERCENTILE($O$2:$O${excel_max_row}, 0.67)', 'format': light_green})
+        worksheet.conditional_format(f'I2:I{excel_max_row}', {'type': 'formula', 'criteria': f'=AND($O2>PERCENTILE($O$2:$O${excel_max_row}, 0.33), $O2<PERCENTILE($O$2:$O${excel_max_row}, 0.67))', 'format': light_orange})
         
         # Col N (Template): Light orange if not Normal, Normal.dot, or Normal.dotm
-        worksheet.conditional_format(f'N2:N{max_row}', {'type': 'formula', 'criteria': '=AND($N2<>"Normal", $N2<>"Normal.dot", $N2<>"Normal.dotm")', 'format': light_orange})
+        worksheet.conditional_format(f'N2:N{excel_max_row}', {'type': 'formula', 'criteria': '=AND($N2<>"Normal", $N2<>"Normal.dot", $N2<>"Normal.dotm")', 'format': light_orange})
 
+    # Adjust visual column widths for readability
     for i, col in enumerate(df.columns):
         if col == '_RawMinutes':
             continue 
         column_len = max(df[col].astype(str).map(len).max(), len(col)) + 2
-        worksheet.set_column(i, i, column_len)
+        # Cap maximum column width at 40 so extremely long titles don't stretch forever
+        worksheet.set_column(i, i, min(column_len, 40))
         
     # Hide Column O securely using standard notation
     worksheet.set_column('O:O', None, None, {'hidden': True})
