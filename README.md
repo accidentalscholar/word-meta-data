@@ -4,17 +4,17 @@ This simple script extracts metadata from Word DOCX files in a folder and provid
 ## Usage
 
 ### Preparation
-Before using this script, ensure all your Word DOCX files are stored in a single folder.
+Before using this script, ensure all your _Word DOCX_ files are stored in a single folder.
 
 ### Running the script
-When you run the Python script, it will pop up a file explorer/finder window asking you to select the folder in which your Word DOCX files are stored.
+When you run the _Python_ script, it will pop up a file explorer/finder window asking you to select the folder in which your _Word DOCX_ files are stored.
 
-Once you have done that, it will extract the metadata from all Word DOCX files in the chosen folder and save the output to an Excel file in the same folder.
+Once you have done that, it will extract the metadata from all _Word DOCX_ files in the chosen folder and save the output to an _Excel_ file in the same folder.
 
 ### Output
-The script will save the output as an Excel file in the same folder as your Word DOCX files.
+The script will save the output as an Excel file in the same folder as your _Word DOCX_ files.
 
-Each row in the table represents a Word DOCX file, and the columns are as following:
+Each row in the table represents a _Word DOCX_ file, and the columns are as following:
 1. Filename
 2. File created (date-time)
 3. Title
@@ -29,33 +29,33 @@ Each row in the table represents a Word DOCX file, and the columns are as follow
 12. Character count
 13. Paragraph count
 14. Template
-15. (Hidden) Editing time in minutes
+15. _(Hidden)_ Editing time in minutes
 
 There is some formatting within the table:
-1. If the Author and Last saver are not the same, then the background is light orange.
-2. If the number of revisions is less than 2, then the background is light orange.
+1. If the Author and Last saver are not the same, then the background is _light orange_.
+2. If the number of revisions is less than 2, then the background is _light orange_.
 3. Total editing time affects the formatting as well, with thirds (33-percentile) formatted differently.
-4. If the template is not Normal, then the background is light orange.
+4. If the template is not Normal, then the background is _light orange_.
 
 ### Note
-The script uses some standard Python libraries. If you don't have them installed on your system, then in the first run, the script will try to install these dependencies. 
+The script uses some standard _Python_ libraries. If you don't have them installed on your system, then in the first run, the script will try to install these dependencies. 
 
 ## Caveat
-Tested on Windows 11 Education 64-bit
+Tested on _Windows 11 Education 64-bit_.
 
-Not tested on Apple iOS or Linux.
+Not tested on _Apple iOS_ or _Linux_.
 
 ## Never run a Python script before?
-It's straightforward, but you may need to install Python on your machine first.
+It's straightforward, but you may need to install _Python_ on your machine first.
 
 ### Install Python
-Anaconda is one of the most popular distributions of Python. Download and install from https://www.anaconda.com/download
+_Anaconda_ is one of the most popular distributions of _Python_. Download and install from https://www.anaconda.com/download
 
-Installation is straightforward, but if you need help, check out https://www.anaconda.com/docs/getting-started/anaconda/install/overview
+Installation is simple, but if you need help, check out https://www.anaconda.com/docs/getting-started/anaconda/install/overview
 
 ### Start Spyder
-Anaconda comes with Spyder IDE. Start Spyder.
+_Anaconda_ comes with _Spyder IDE_. Start _Spyder_.
 
-Once Spyder is ready, open the file 'word-metadata-extractor.py' that has the script.
+Once _Spyder_ is ready, open the file 'word-metadata-extractor.py' that has the script.
 
 All that's left is for you to hit 'Run', i.e. the green 'Play' button.
