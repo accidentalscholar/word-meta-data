@@ -1,5 +1,5 @@
 # Word Metadata Extractor
-This simple script extracts metadata from Word DOCX files in a folder and provides the output as an Excel sheet.
+This simple script extracts metadata from _Word DOCX_ files in a folder and provides the output as an Excel sheet.
 
 ## Usage
 
