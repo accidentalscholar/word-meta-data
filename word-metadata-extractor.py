@@ -1,7 +1,7 @@
 # ==========================================
 # Word Metadata Extractor 
-# Version: 5.1
-# Citation: Pundir, V. (2026, May 27). Word Metadata Extractor Version (5.1). Retrieved from https://github.com/accidentalscholar/word-meta-data. 
+# Version: 6.0
+# Citation: Pundir, V. (2026, September 13). Word Metadata Extractor Version (6.0). Retrieved from https://github.com/accidentalscholar/word-meta-data. 
 # Citation: RIS and BibTeX files included for referencing software.
 # Tested in: Python 3.10.9 64 bit packaged by Anaconda, Inc.
 # Reporsitory: https://github.com/accidentalscholar/word-meta-data
@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ET
 import tkinter as tk
 from tkinter import filedialog
 
-# --- Fault Tolerance: Auto-Install Missing Libraries ---
+# --- 1. Fault Tolerance: Auto-Install Missing Libraries ---
 REQUIRED_PACKAGES = {
     'pandas': 'pandas',
     'xlsxwriter': 'xlsxwriter'
@@ -41,8 +41,8 @@ for import_name, pip_name in REQUIRED_PACKAGES.items():
 
 import pandas as pd
 
-# --- Configuration ---
-VERSION = "5.0"
+# --- 2. Configuration ---
+VERSION = "6.0"
 OUTPUT_FILENAME = f"Word_Metadata_Extracted_v{VERSION}.xlsx"
 
 def get_xml_text(tree, tag_name):
@@ -79,7 +79,7 @@ def extract_docx_metadata(file_path):
     
     try:
         with zipfile.ZipFile(file_path, 'r') as docx_zip:
-            # Parse core.xml (Authors, Dates, Revisions)
+            # 1. Parse core.xml (Authors, Dates, Revisions)
             if 'docProps/core.xml' in docx_zip.namelist():
                 core_xml = docx_zip.read('docProps/core.xml')
                 core_tree = ET.fromstring(core_xml)
@@ -94,7 +94,7 @@ def extract_docx_metadata(file_path):
                 metadata['Content created (date-time)'] = get_xml_text(core_tree, 'created')
                 metadata['Last date saved (date-time)'] = get_xml_text(core_tree, 'modified')
 
-            # Parse app.xml (Pages, Words, Template, Editing Time)
+            # 2. Parse app.xml (Pages, Words, Template, Editing Time)
             if 'docProps/app.xml' in docx_zip.namelist():
                 app_xml = docx_zip.read('docProps/app.xml')
                 app_tree = ET.fromstring(app_xml)
@@ -224,11 +224,20 @@ def main():
         # Col N (Template): Light orange if not Normal, Normal.dot, or Normal.dotm
         worksheet.conditional_format(f'N2:N{excel_max_row}', {'type': 'formula', 'criteria': '=AND($N2<>"Normal", $N2<>"Normal.dot", $N2<>"Normal.dotm")', 'format': light_orange})
 
-    # Adjust visual column widths for readability
     for i, col in enumerate(df.columns):
         if col == '_RawMinutes':
             continue 
-        column_len = max(df[col].astype(str).map(len).max(), len(col)) + 2
+            
+        try:
+            # Safely calculate the max length of strings in the column, ignoring NAs completely
+            max_data_len = df[col].astype(str).str.len().max()
+            if pd.isna(max_data_len):
+                max_data_len = 0
+        except Exception:
+            max_data_len = 0
+            
+        column_len = int(max(max_data_len, len(str(col)))) + 2
+        
         # Cap maximum column width at 40 so extremely long titles don't stretch forever
         worksheet.set_column(i, i, min(column_len, 40))
         
