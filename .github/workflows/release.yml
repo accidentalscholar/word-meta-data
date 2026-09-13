@@ -4,17 +4,15 @@ on:
   release:
     types: [published]
 
+# 1. THIS FIXES THE PERMISSION ERROR
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
       matrix:
-        include:
-          - os: windows-latest
-            artifact_name: word-metadata-extractor.exe
-            asset_name: app-windows.exe
-          - os: macos-latest
-            artifact_name: word-metadata-extractor
-            asset_name: app-macos
+        os: [windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -28,15 +26,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-            python -m pip install --upgrade pip
-            pip install pyinstaller pandas xlsxwriter
+        python -m pip install --upgrade pip
+        pip install pyinstaller pandas xlsxwriter
 
     - name: Build with PyInstaller
-      run: pyinstaller --onefile --name YOUR_SCRIPT_NAME --hidden-import=xlsxwriter word-metadata-extractor.py
+      run: pyinstaller --onefile --name word-metadata-extractor --hidden-import=xlsxwriter word-metadata-extractor.py
 
     - name: Upload Release Asset
       uses: softprops/action-gh-release@v2
       with:
-        files: dist/${{ matrix.artifact_name }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # 2. THIS FIXES THE MISSING FILE ERROR
+        files: dist/*
