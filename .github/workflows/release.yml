@@ -4,7 +4,6 @@ on:
   release:
     types: [published]
 
-# 1. THIS FIXES THE PERMISSION ERROR
 permissions:
   contents: write
 
@@ -33,8 +32,8 @@ jobs:
       run: pyinstaller --onefile --name word-metadata-extractor --hidden-import=xlsxwriter word-metadata-extractor.py
 
     - name: Upload Release Asset
-          uses: softprops/action-gh-release@v2
-          with:
-            files: dist/*
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
+      with:
+        files: dist/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
