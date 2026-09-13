@@ -1,7 +1,7 @@
 # ==========================================
 # Word Metadata Extractor 
-# Version: 5.0
-# Citation: Pundir, V. (2026, May 27). Word Metadata Extractor Version (5.0). Retrieved from https://github.com/accidentalscholar/word-meta-data. 
+# Version: 5.1
+# Citation: Pundir, V. (2026, May 27). Word Metadata Extractor Version (5.1). Retrieved from https://github.com/accidentalscholar/word-meta-data. 
 # Citation: RIS and BibTeX files included for referencing software.
 # Tested in: Python 3.10.9 64 bit packaged by Anaconda, Inc.
 # Reporsitory: https://github.com/accidentalscholar/word-meta-data
@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ET
 import tkinter as tk
 from tkinter import filedialog
 
-# --- 1. Fault Tolerance: Auto-Install Missing Libraries ---
+# --- Fault Tolerance: Auto-Install Missing Libraries ---
 REQUIRED_PACKAGES = {
     'pandas': 'pandas',
     'xlsxwriter': 'xlsxwriter'
@@ -41,7 +41,7 @@ for import_name, pip_name in REQUIRED_PACKAGES.items():
 
 import pandas as pd
 
-# --- 2. Configuration ---
+# --- Configuration ---
 VERSION = "5.0"
 OUTPUT_FILENAME = f"Word_Metadata_Extracted_v{VERSION}.xlsx"
 
@@ -79,7 +79,7 @@ def extract_docx_metadata(file_path):
     
     try:
         with zipfile.ZipFile(file_path, 'r') as docx_zip:
-            # 1. Parse core.xml (Authors, Dates, Revisions)
+            # Parse core.xml (Authors, Dates, Revisions)
             if 'docProps/core.xml' in docx_zip.namelist():
                 core_xml = docx_zip.read('docProps/core.xml')
                 core_tree = ET.fromstring(core_xml)
@@ -94,7 +94,7 @@ def extract_docx_metadata(file_path):
                 metadata['Content created (date-time)'] = get_xml_text(core_tree, 'created')
                 metadata['Last date saved (date-time)'] = get_xml_text(core_tree, 'modified')
 
-            # 2. Parse app.xml (Pages, Words, Template, Editing Time)
+            # Parse app.xml (Pages, Words, Template, Editing Time)
             if 'docProps/app.xml' in docx_zip.namelist():
                 app_xml = docx_zip.read('docProps/app.xml')
                 app_tree = ET.fromstring(app_xml)

@@ -1,56 +1,40 @@
-name: Cross-Platform Build & Release
+name: Publish Release
 
 on:
-  push:
-    branches: [ main, master ]
   release:
     types: [published]
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
           - os: windows-latest
             artifact_name: word-metadata-extractor.exe
+            asset_name: app-windows.exe
           - os: macos-latest
-            artifact_name: word-metadata-extractor.app
+            artifact_name: word-metadata-extractor
+            asset_name: app-macos
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.14.6' # Change to match your local Python version
+    - name: Set up Python 3.14.6
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.14.6'
 
-      - name: Install dependencies
-        run: |
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install nuitka; fi
-        shell: bash
+    - name: Install PyInstaller
+      run: python -m pip install pyinstaller
 
-      - name: Build with Nuitka
-        uses: Nuitka/Nuitka-Action@main
-        with:
-          nuitka-version: main
-          script-name: word-metadata-extractor.py # Replace with your actual entry script filename
-          standalone: true
-          macos-create-app-bundle: true
-          
-          # Hides the black terminal/command prompt window for GUI apps
-          disable-console: true
-          
-          # Enforces clean compilation for tkinter and standard UI extensions
-          enable-plugins: tk-inter
+    - name: Build with PyInstaller
+      run: pyinstaller --onefile --name word-metadata-extractor word-metadata-extractor.py
 
-      - name: Upload Release Asset
-        if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            build/${{ matrix.artifact_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Release Asset
+      uses: softprops/action-gh-release@v2
+      with:
+        files: dist/${{ matrix.artifact_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
